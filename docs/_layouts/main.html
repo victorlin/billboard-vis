@@ -1,0 +1,56 @@
+---
+layout: default
+---
+
+<div style="width: 100%; height: 100%;">
+    <canvas id="myChart" style="width: 100%; height: auto;"></canvas>
+</div>
+<div id="js-legend" class="chart-legend"></div>
+
+<script>
+
+var chartData = {{ site.data.hot100_2017_top10s | jsonify }}
+
+var chartSettings = {
+     data: chartData,
+     options: {
+         legend: {
+           display: false,
+           position: 'right'
+         },
+         responsive: true,
+         hover: {
+           mode: 'dataset'
+         },
+         stacked: false,
+         scales: {
+             xAxes: [
+                 {
+                     display: true,
+                     gridLines: {
+                         offsetGridLines: false
+                     },
+                 }
+             ],
+             yAxes: [
+                 {
+                     type: "linear",
+                     display: true,
+                     position: "right",
+          					 ticks : {
+                         max : 100,
+                         min : 1,
+                         reverse : true
+                     },
+                     gridLines: {
+                         drawOnChartArea: true
+                     },
+                 }
+             ],
+         },
+     }
+ }
+var ctx = document.getElementById('myChart').getContext('2d');
+var myChart = new Chart.Line(ctx,chartSettings);
+document.getElementById('js-legend').innerHTML = myChart.generateLegend();
+</script>
