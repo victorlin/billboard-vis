@@ -16,8 +16,7 @@ def get_df(chart_name, year):
                        'rank': pd.Series([], dtype='int')})
     i = 0
     chart = billboard.ChartData(chart_name)
-    # while chart.previousDate[:4] == str(year):
-    for j in range(2):
+    while chart.previousDate[:4] == str(year):
         if i != 0:
             chart = billboard.ChartData(chart_name, date=chart.previousDate)
         print('fetching data for week of', chart.date_str)
