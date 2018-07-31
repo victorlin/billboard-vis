@@ -3,20 +3,18 @@ layout: default
 ---
 
 <div style="width: 100%; height: 100%;">
-    <canvas id="myChart" style="width: 100%; height: auto;"></canvas>
+    <canvas id="lineChart" style="width: 100%; height: auto;"></canvas>
 </div>
-<div id="js-legend" class="chart-legend"></div>
 
 <script>
 
-var chartData = {{ site.data.hot100_2017_top10s | jsonify }}
+var hot100LineData = {{ site.data.hot100_2017_top10s | jsonify }}
 
-var chartSettings = {
-     data: chartData,
+var settingsLineChart = {
+     data: hot100LineData,
      options: {
          legend: {
            display: false,
-           position: 'right'
          },
          responsive: true,
          hover: {
@@ -50,7 +48,6 @@ var chartSettings = {
          },
      }
  }
-var ctx = document.getElementById('myChart').getContext('2d');
-var myChart = new Chart.Line(ctx,chartSettings);
-document.getElementById('js-legend').innerHTML = myChart.generateLegend();
+var ctxLineChart = document.getElementById('lineChart').getContext('2d');
+var lineChart = new Chart.Line(ctxLineChart, settingsLineChart);
 </script>
