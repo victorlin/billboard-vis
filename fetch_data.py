@@ -4,38 +4,51 @@ import billboard
 import pandas as pd
 import numpy as np
 import json
+import datetime
 
 
 def get_df(chart_name, year):
-    """Return dataframe with song, date, rank columns
+    """Return dataframe with song, artist, title, date, and rank columns
 
     Fetch charts from current date until beginning of `year`
     """
     df = pd.DataFrame({'song': pd.Series([], dtype='str'),
+                       'artist': pd.Series([], dtype='str'),
+                       'title': pd.Series([], dtype='str'),
                        'date': pd.Series([], dtype='datetime64[ns]'),
                        'rank': pd.Series([], dtype='int')})
     i = 0
-    chart = billboard.ChartData(chart_name)
-    while chart.previousDate[:4] == str(year):
+    chart = billboard.ChartData(chart_name, '{}-01-01'.format(year))
+    while hasattr(chart, 'nextDate') and chart.nextDate[:4] == str(year):
         if i != 0:
-            chart = billboard.ChartData(chart_name, date=chart.previousDate)
-        print('fetching data for week of', chart.date_str)
+            chart = billboard.ChartData(chart_name, date=chart.nextDate)
+        print('week of {} retrieved'.format(chart.date))
         for song in chart:
             song_str = str(song)
             df.loc[i] = {'song': song_str,
-                         'date': chart.date,
+                         'artist': song.artist,
+                         'title': song.title,
+                         'date': datetime.datetime.strptime(chart.date, '%Y-%m-%d').date(),
                          'rank': song.rank}
             i += 1
     return df
 
 
-def write_json(df, fpath):
-    """Write data for chart.js
+def write_linechart_json(df, fpath, cutoff=20):
+    """Write data for chart.js line chart
 
-    Subset: only include songs that have reached top 10 ranking.
+    Parameters
+    ----------
+    df : pd.DataFrame
+        dataframe with required columns song / date / rank
+    fpath : str
+        output filepath
+    cutoff : int
+        only include songs that have reached this ranking or higher.
     """
-    dates = np.flipud(df['date'].unique())
-    all_top10s = df.loc[df['rank'] <= 10, 'song'].unique()
+    # dates = np.flipud(df['date'].unique())
+    dates = df['date'].unique()
+    all_top10s = df.loc[df['rank'] <= cutoff, 'song'].unique()
     songs_group = df.groupby('song')
 
     data = {}
@@ -57,5 +70,13 @@ def write_json(df, fpath):
     with open(fpath, 'w') as f:
         json.dump(data, f)
 
-df = get_df('hot-100', 2017)
-write_json(df, 'docs/_data/hot100_2017_top10s.json')
+
+def generate_json_for(chart_name, year, cutoff=20):
+    df = get_df(chart_name, year)
+    fpath = 'docs/_data/{}_{}_top{}.json'.format(chart_name.replace('-', ''),
+                                                 year, cutoff)
+    write_linechart_json(df, fpath, cutoff)
+
+
+if __name__ == '__main__':
+    generate_json_for('hot-100', 2017)
