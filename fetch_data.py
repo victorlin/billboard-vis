@@ -34,7 +34,7 @@ def get_df(chart_name, year):
     return df
 
 
-def write_linechart_json(df, fpath, cutoff=20):
+def write_linechart_json(df, fpath, cutoff):
     """Write data for chart.js line chart
 
     Parameters
@@ -71,7 +71,7 @@ def write_linechart_json(df, fpath, cutoff=20):
         json.dump(data, f)
 
 
-def generate_json_for(chart_name, year, cutoff=20):
+def generate_json_for(chart_name, year, cutoff=10):
     df = get_df(chart_name, year)
     fpath = 'docs/_data/{}_{}_top{}.json'.format(chart_name.replace('-', ''),
                                                  year, cutoff)
