@@ -2,8 +2,50 @@
 layout: default
 ---
 
+<div style="height:200px;overflow:auto;">
+    <table>
+        <thead>
+        <tr>
+            <th><input type="checkbox" onClick="checkAll(this)"/></th>
+            <th>Title</th>
+            <th>Artist</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for x in site.data.hot100_2017_top10.datasets %}
+            <tr>
+                <td><input type="checkbox" />    &nbsp;   </td>
+                <td>{{ x.title }}</td>
+                <td>{{ x.artist }}</td>
+                <td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
 <div style="width: 100%; height: 100%;">
     <canvas id="lineChart" style="width: 100%; height: auto;"></canvas>
 </div>
 
 <script type="text/javascript" src="{{site.baseurl}}/assets/js/linechart.js"></script>
+
+<script>
+function checkAll(ele) {
+     var checkboxes = document.getElementsByTagName('input');
+     if (ele.checked) {
+         for (var i = 0; i < checkboxes.length; i++) {
+             if (checkboxes[i].type == 'checkbox') {
+                 checkboxes[i].checked = true;
+             }
+         }
+     } else {
+         for (var i = 0; i < checkboxes.length; i++) {
+             console.log(i)
+             if (checkboxes[i].type == 'checkbox') {
+                 checkboxes[i].checked = false;
+             }
+         }
+     }
+ }
+</script>

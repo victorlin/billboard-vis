@@ -31,6 +31,9 @@ def get_df(chart_name, year):
                          'date': datetime.datetime.strptime(chart.date, '%Y-%m-%d').date(),
                          'rank': song.rank}
             i += 1
+
+        if i > 400:
+            break
     return df
 
 
@@ -48,19 +51,24 @@ def write_linechart_json(df, fpath, cutoff):
     """
     # dates = np.flipud(df['date'].unique())
     dates = df['date'].unique()
-    all_top10s = df.loc[df['rank'] <= cutoff, 'song'].unique()
+    all_top10s = df.loc[df['rank'] <= cutoff, ('song', 'title', 'artist')].drop_duplicates()
+    print(all_top10s)
     songs_group = df.groupby('song')
 
     data = {}
     data['labels'] = [str(v) for v in dates.astype('datetime64[D]')]
     data['datasets'] = []
 
-    for song in all_top10s:
+    for i, (song, title, artist) in all_top10s.iterrows():
         df_song = songs_group.get_group(song)
         df_song.set_index('date', inplace=True)
         ds = {'label': song,
+              'title': title,
+              'artist': artist,
               'fill': False,
               'hidden': False,
+              'borderColor': 'rgba(0, 0, 0, 0.3)',
+              'pointBackgroundColor': 'rgba(0, 0, 0, 0.3)',
               'pointHoverBackgroundColor': 'red',
               'data': [df_song.loc[date, 'rank']
                        if date in df_song.index else np.nan
